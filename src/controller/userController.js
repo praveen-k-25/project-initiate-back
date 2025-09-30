@@ -1,10 +1,78 @@
-// register user
+const {asyncHandler} = require("../middleware/ErrorHandler");
+const {getCollection} = require("../models/dbModel");
+const {registerModel} = require("../models/userModel");
+const {VerifyPassword, hashPassword} = require("../utils/Hashing");
+const {accessToken, refreshToken} = require("../utils/TokenHandler");
 
-const registerUser = async (req, res) => {};
+// register user
+const registerUser = async (req, res) => {
+  const {username, email, password, confirmPassword} = req.body;
+  const user = await getCollection(process.env.USER_COLLECTION).findOne({
+    email,
+  });
+  if (user) {
+    let error = new Error();
+    error.status = 400;
+    error.message = "User already exists";
+    throw error;
+  }
+
+  if (password !== confirmPassword) {
+    let error = new Error();
+    error.status = 400;
+    error.message = "Password do not match";
+    throw error;
+  }
+
+  const hashedPassword = await hashPassword(password);
+  const newUser = await registerModel(process.env.USER_COLLECTION, {
+    username,
+    email,
+    password: hashedPassword,
+  });
+  console.log(newUser);
+  res.status(200).json({success: true, message: "User registered"});
+};
 
 // login user
 
-const loginUser = async (req, res) => {};
+const loginUser = asyncHandler(async (req, res) => {
+  const {email, password} = req.body;
+  const user = await getCollection(process.env.USER_COLLECTION).findOne({
+    email,
+  });
+  if (!user) {
+    let error = new Error();
+    error.status = 400;
+    error.message = "User not found";
+    throw error;
+  }
+  const isMatch = await VerifyPassword(user.password, password);
+  if (!isMatch) {
+    let error = new Error();
+    error.status = 400;
+    error.message = "Invalid Password";
+    throw error;
+  }
+  res.cookie("accessId", accessToken(user), {
+    httpOnly: true,
+    secure: true,
+    sameSite: "strict", 
+  });
+  res.cookie("refreshId", refreshToken(user), {
+    httpOnly: true,
+    secure: true,
+    sameSite: "strict",
+  });
+  res
+    .status(200)
+    .json({
+      success: true,
+      message: "User logged in Successfully",
+      accessToken: accessToken(user),
+      refreshToken: refreshToken(user),
+    });
+});
 
 module.exports = {
   registerUser,

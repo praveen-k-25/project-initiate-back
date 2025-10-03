@@ -1,15 +1,16 @@
-const { asyncHandler } = require("../middleware/ErrorHandler");
-const { getCollection } = require("../models/dbModel");
-const { registerModel } = require("../models/userModel");
-const { VerifyPassword, hashPassword } = require("../utils/Hashing");
-const { accessToken, refreshToken } = require("../utils/TokenHandler");
+const {asyncHandler} = require("../middleware/ErrorHandler");
+const {getCollection} = require("../models/dbModel");
+const {registerModel} = require("../models/userModel");
+const {VerifyPassword, hashPassword} = require("../utils/Hashing");
+const {accessToken, refreshToken} = require("../utils/TokenHandler");
 
 // register user
 const registerUser = async (req, res) => {
-  const { username, email, password, confirmPassword } = req.body;
+  const {username, email, password, confirmPassword} = req.body;
   const user = await getCollection(process.env.USER_COLLECTION).findOne({
     email,
   });
+  console.log(user);
   if (user) {
     let error = new Error();
     error.status = 400;
@@ -31,13 +32,13 @@ const registerUser = async (req, res) => {
     password: hashedPassword,
   });
   console.log(newUser);
-  res.status(200).json({ success: true, message: "User registered" });
+  res.status(200).json({success: true, message: "User registered"});
 };
 
 // login user
 
 const loginUser = asyncHandler(async (req, res) => {
-  const { email, password } = req.body;
+  const {email, password} = req.body;
   const user = await getCollection(process.env.USER_COLLECTION).findOne({
     email,
   });
@@ -69,8 +70,11 @@ const loginUser = asyncHandler(async (req, res) => {
   res.status(200).json({
     success: true,
     message: "User logged in Successfully",
-    accessToken: accessToken(user),
-    refreshToken: refreshToken(user),
+    data: {
+      username: user.username,
+      email: user.email,
+      id: user._id,
+    },
   });
 });
 

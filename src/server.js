@@ -15,7 +15,8 @@ app.use(
     origin: [
       "http://localhost:5173",
       "https://1d2103g4-5173.inc1.devtunnels.ms",
-      "https://project-initiate.onrender.com"
+      "https://project-initiate.onrender.com",
+      "https://metromicron.netlify.app"
     ],
     credentials: true,
   })

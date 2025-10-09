@@ -10,7 +10,6 @@ const registerUser = async (req, res) => {
   const user = await getCollection(process.env.USER_COLLECTION).findOne({
     email,
   });
-  console.log(user);
   if (user) {
     let error = new Error();
     error.status = 400;
@@ -45,6 +44,7 @@ const loginUser = asyncHandler(async (req, res) => {
   if (!user) {
     let error = new Error();
     error.status = 400;
+    error.cause = "email";
     error.message = "User not found";
     throw error;
   }
@@ -52,6 +52,7 @@ const loginUser = asyncHandler(async (req, res) => {
   if (!isMatch) {
     let error = new Error();
     error.status = 400;
+    error.cause = "password";
     error.message = "Invalid Password";
     throw error;
   }

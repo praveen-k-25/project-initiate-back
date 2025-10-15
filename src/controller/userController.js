@@ -1,43 +1,37 @@
-const {asyncHandler} = require("../middleware/ErrorHandler");
-const {getCollection} = require("../models/dbModel");
-const {registerModel} = require("../models/userModel");
-const {VerifyPassword, hashPassword} = require("../utils/Hashing");
-const {accessToken, refreshToken} = require("../utils/TokenHandler");
+const { asyncHandler } = require("../middleware/ErrorHandler");
+const { getCollection } = require("../models/dbModel");
+const { registerModel } = require("../models/userModel");
+const { VerifyPassword, hashPassword } = require("../utils/Hashing");
+const { accessToken, refreshToken } = require("../utils/TokenHandler");
+const { verifyRegisterOtp } = require("./mailController");
 
 // register user
 const registerUser = async (req, res) => {
-  const {username, email, password, confirmPassword} = req.body;
-  const user = await getCollection(process.env.USER_COLLECTION).findOne({
-    email,
-  });
-  if (user) {
-    let error = new Error();
-    error.status = 400;
-    error.message = "User email already exists";
-    throw error;
-  }
+  const { username, email, password, otp } = req.body;
+  const verified = verifyRegisterOtp({ email, otp });
 
-  if (password !== confirmPassword) {
+  if (!verified) {
     let error = new Error();
     error.status = 400;
-    error.message = "Password do not match";
+    error.cause = "otp";
+    error.message = "Invalid OTP";
     throw error;
   }
 
   const hashedPassword = await hashPassword(password);
-  const newUser = await registerModel(process.env.USER_COLLECTION, {
+  await registerModel(process.env.USER_COLLECTION, {
     username,
     email,
     password: hashedPassword,
   });
-  console.log(newUser);
-  res.status(200).json({success: true, message: "User registered"});
+
+  res.status(200).json({ success: true, message: "User registered" });
 };
 
 // login user
 
 const loginUser = asyncHandler(async (req, res) => {
-  const {email, password} = req.body;
+  const { email, password } = req.body;
   const user = await getCollection(process.env.USER_COLLECTION).findOne({
     email,
   });

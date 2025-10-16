@@ -22,20 +22,23 @@ const sendRegisterOtp = async (req, res) => {
   if (!isMailSent) {
     let error = new Error();
     error.status = 500;
-    error.message = "Mail not sent";
+    error.message = "OTP not sent";
     throw error;
   }
   otpStore.set(email, { otp, expires: Date.now() + 5 * 60 * 1000 });
   return res.status(200).json({ success: true, message: "OTP sent" });
 };
 
-const verifyRegisterOtp = async (req, res) => {
-  const { email, otp } = req.body;
+const verifyRegisterOtp = async (data) => {
+  const { email, otp } = data;
+  console.log("email : ", email, "OTP : ", otp);
   const storedOtp = otpStore.get(email);
+  console.log(storedOtp, " OTP : ", otp);
+  console.log("otpStore : ", otpStore);
   if (!storedOtp) {
     return false;
   }
-  if (storedOtp.otp !== otp) {
+  if (storedOtp.otp !== Number(otp)) {
     return false;
   }
   if (storedOtp.expires < Date.now()) {

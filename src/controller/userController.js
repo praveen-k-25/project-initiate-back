@@ -8,7 +8,8 @@ const { verifyRegisterOtp } = require("./mailController");
 // register user
 const registerUser = async (req, res) => {
   const { username, email, password, otp } = req.body;
-  const verified = verifyRegisterOtp({ email, otp });
+  const verified = await verifyRegisterOtp({ email, otp });
+  console.log(verified);
 
   if (!verified) {
     let error = new Error();

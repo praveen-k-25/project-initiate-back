@@ -17,10 +17,5 @@ const userRouter = express.Router();
 userRouter.post("/register", Validation(registerSchema), registerUser);
 userRouter.post("/login", Validation(loginSchema), loginUser);
 userRouter.post("/registerOtp", Validation(registerOtpSchema), sendRegisterOtp);
-userRouter.post(
-  "/verifyRegisterOtp",
-  Validation(verifyRegisterOtpSchema),
-  verifyRegisterOtp
-);
 
 module.exports = userRouter;

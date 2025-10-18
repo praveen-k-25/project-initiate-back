@@ -1,21 +1,32 @@
 const express = require("express");
-const { registerUser, loginUser } = require("../controller/userController");
+const {
+  registerUser,
+  loginUser,
+  forgotPassword,
+} = require("../controller/userController");
 
 const Validation = require("../middleware/ValidationHandler");
 const {
   registerSchema,
   loginSchema,
   verifyRegisterOtpSchema,
-  registerOtpSchema,
+  otpSchema,
+  verifyForgotPasswordOtpSchema,
 } = require("../utils/authValidationSchema");
 const {
   sendRegisterOtp,
-  verifyRegisterOtp,
+  forgotPasswordOtp,
 } = require("../controller/mailController");
 const userRouter = express.Router();
 
-userRouter.post("/register", Validation(registerSchema), registerUser);
 userRouter.post("/login", Validation(loginSchema), loginUser);
-userRouter.post("/registerOtp", Validation(registerOtpSchema), sendRegisterOtp);
+userRouter.post("/registerOtp", Validation(otpSchema), sendRegisterOtp);
+userRouter.post("/register", Validation(registerSchema), registerUser);
+userRouter.post("/forgotPasswordOtp", Validation(otpSchema), forgotPasswordOtp);
+userRouter.post(
+  "/forgotPassword",
+  Validation(verifyForgotPasswordOtpSchema),
+  forgotPassword
+);
 
 module.exports = userRouter;

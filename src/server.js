@@ -1,8 +1,8 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
-const {connectDB} = require("./database/db");
-const {globalErrorHandler} = require("./middleware/ErrorHandler");
+const { connectDB } = require("./database/db");
+const { globalErrorHandler } = require("./middleware/ErrorHandler");
 const userRouter = require("./routes/userRoutes");
 const app = express();
 
@@ -16,7 +16,7 @@ app.use(
       "http://localhost:5173",
       "https://1d2103g4-5173.inc1.devtunnels.ms",
       "https://project-initiate.onrender.com",
-      "https://metromicron.netlify.app"
+      "https://metromicron.netlify.app",
     ],
     credentials: true,
   })

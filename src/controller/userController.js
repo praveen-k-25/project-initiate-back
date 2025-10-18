@@ -3,13 +3,15 @@ const { getCollection } = require("../models/dbModel");
 const { registerModel } = require("../models/userModel");
 const { VerifyPassword, hashPassword } = require("../utils/Hashing");
 const { accessToken, refreshToken } = require("../utils/TokenHandler");
-const { verifyRegisterOtp } = require("./mailController");
+const {
+  verifyRegisterOtp,
+  verifyForgotPasswordOtp,
+} = require("./mailController");
 
 // register user
 const registerUser = async (req, res) => {
   const { username, email, password, otp } = req.body;
   const verified = await verifyRegisterOtp({ email, otp });
-  console.log(verified);
 
   if (!verified) {
     let error = new Error();
@@ -74,7 +76,30 @@ const loginUser = asyncHandler(async (req, res) => {
   });
 });
 
+// forgot password
+
+const forgotPassword = async (req, res) => {
+  const { email, newPassword, otp } = req.body;
+  const verify = await verifyForgotPasswordOtp({ email, otp });
+
+  if (!verify) {
+    let error = new Error();
+    error.status = 400;
+    error.cause = "otp";
+    error.message = "Invalid OTP";
+    throw error;
+  }
+
+  const hashedPassword = await hashPassword(newPassword);
+  await getCollection(process.env.USER_COLLECTION).updateOne(
+    { email },
+    { $set: { password: hashedPassword } }
+  );
+  res.status(200).json({ success: true, message: "Password changed" });
+};
+
 module.exports = {
   registerUser,
   loginUser,
+  forgotPassword,
 };

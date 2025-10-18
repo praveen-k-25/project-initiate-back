@@ -8,7 +8,7 @@ const registerSchema = yup.object({
     .min(6)
     .required()
     .email({ tlds: { allow: false } }), // for specific domain [".com",".net"]
-  password: yup.string().min(6).max(16).required(),
+  password: yup.string().min(6).max(20).required(),
   confirmPassword: yup
     .string()
     .required()
@@ -23,10 +23,10 @@ const loginSchema = yup.object({
     .min(6)
     .required()
     .email({ tlds: { allow: false } }), // for specific domain [".com",".net"]
-  password: yup.string().min(6).max(16).required(),
+  password: yup.string().min(6).max(20).required(),
 });
 
-const registerOtpSchema = yup.object().shape({
+const otpSchema = yup.object().shape({
   email: yup
     .string()
     .matches(/^[^\s@]+@[^\s@]+\.[^\s@]+$/, "invalid email address")
@@ -43,9 +43,19 @@ const verifyRegisterOtpSchema = yup.object().shape({
   otp: yup.number().required(),
 });
 
+const verifyForgotPasswordOtpSchema = yup.object().shape({
+  email: yup
+    .string()
+    .matches(/^[^\s@]+@[^\s@]+\.[^\s@]+$/, "invalid email address")
+    .required("email is required")
+    .email("email is invalid"),
+  otp: yup.number().required(),
+  newPassword: yup.string().min(6).max(20).required(),
+});
 module.exports = {
   registerSchema,
   loginSchema,
-  registerOtpSchema,
+  otpSchema,
   verifyRegisterOtpSchema,
+  verifyForgotPasswordOtpSchema,
 };

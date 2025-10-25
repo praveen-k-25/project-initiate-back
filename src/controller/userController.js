@@ -53,18 +53,21 @@ const loginUser = asyncHandler(async (req, res) => {
     error.message = "Invalid Password";
     throw error;
   }
+
   res.cookie("accessId", accessToken(user), {
     httpOnly: true,
     secure: true,
     sameSite: "None",
     expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7), // 7 days
   });
+
   res.cookie("refreshId", refreshToken(user), {
     httpOnly: true,
     secure: true,
     sameSite: "None",
     expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7), // 7 days
   });
+
   res.status(200).json({
     success: true,
     message: "User logged in Successfully",

@@ -7,7 +7,7 @@ const accessToken = (user) => {
     },
     process.env.ACCESS_TOKEN_SECRET,
     {
-      expiresIn: "15m",
+      expiresIn: "1d",
     }
   );
   return accessToken;
@@ -33,7 +33,6 @@ const VerifyAccessToken = (token) => {
 
 const VerifyRefreshToken = (token) => {
   const decoded = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
-  console.log(decoded);
 };
 
 module.exports = {

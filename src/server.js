@@ -4,6 +4,7 @@ const cors = require("cors");
 const { connectDB } = require("./database/db");
 const { globalErrorHandler } = require("./middleware/ErrorHandler");
 const userRouter = require("./routes/userRoutes");
+const dataRouter = require("./routes/dataRouter");
 const app = express();
 
 // connect to database
@@ -26,6 +27,7 @@ app.use(express.json());
 
 // routes
 app.use("/user", userRouter);
+app.use("/data", dataRouter);
 
 // captures all errors
 app.use(globalErrorHandler);

@@ -1,4 +1,8 @@
-const { movingReportData, getDateTime } = require("../functions/movingData");
+const {
+  movingReportData,
+  playbackReportData,
+  getDateTime,
+} = require("../functions/movingData");
 const { getCollection } = require("../models/dbModel");
 
 const movingReport = async (req, res) => {
@@ -20,4 +24,23 @@ const movingReport = async (req, res) => {
   });
 };
 
-module.exports = { movingReport };
+const playbackReport = async (req, res) => {
+  const { startDate, endDate } = req.body;
+  const rawData = await getCollection(process.env.DATA_COLLECTION)
+    .find({
+      speed: { $gt: 0 },
+      timestamp: {
+        $gte: new Date(startDate).getTime(),
+        $lt: new Date(endDate).getTime(),
+      },
+    })
+    .toArray();
+
+  const resultData = playbackReportData(rawData);
+  res.status(200).json({
+    success: true,
+    data: resultData,
+  });
+};
+
+module.exports = { movingReport, playbackReport };

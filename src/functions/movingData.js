@@ -77,9 +77,57 @@ function movingReportData(data) {
 
   return resultData;
 }
+function playbackReportData(data) {
+  let previousData;
+  let currentData = [];
+  let resultData = [];
+  const difference = 60 * 1000;
+
+  data.forEach((item, index) => {
+    if (Object.entries(currentData).length === 0) {
+      currentData.push({
+        lat: item.lat,
+        lng: item.lng,
+      });
+      previousData = item;
+      return;
+    }
+
+    if (
+      item.timestamp - previousData.timestamp > difference ||
+      index === data.length - 1
+    ) {
+      if (currentData.length > 0) {
+        resultData.push(currentData);
+        currentData.push({
+          lat: item.lat,
+          lng: item.lng,
+        });
+        currentData = [];
+        return;
+      } else {
+        currentData = [];
+      }
+    }
+
+    if (
+      item.timestamp - previousData.timestamp > 1000 &&
+      item.timestamp - previousData.timestamp <= difference
+    ) {
+      currentData.push({
+        lat: item.lat,
+        lng: item.lng,
+      });
+      previousData = item;
+    }
+  });
+
+  return resultData;
+}
 
 module.exports = {
   movingReportData,
+  playbackReportData,
   getDateTime,
   getTimeDifference,
 };

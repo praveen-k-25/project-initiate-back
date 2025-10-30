@@ -34,7 +34,7 @@ function movingReportData(data) {
   let previousData;
   let currentData = {};
   let resultData = [];
-  const difference = 60 * 1000;
+  const difference = 3 * 60 * 1000;
 
   data.forEach((item, index) => {
     if (Object.entries(currentData).length === 0) {
@@ -77,6 +77,7 @@ function movingReportData(data) {
 
   return resultData;
 }
+
 function playbackReportData(data) {
   let previousData;
   let currentData = [];

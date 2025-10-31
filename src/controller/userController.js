@@ -35,7 +35,7 @@ const registerUser = async (req, res) => {
 
 const loginUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
-  const user = await getCollection(process.env.USER_COLLECTION).findOne({
+  let user = await getCollection(process.env.USER_COLLECTION).findOne({
     email,
   });
   if (!user) {
@@ -52,6 +52,18 @@ const loginUser = asyncHandler(async (req, res) => {
     error.cause = "password";
     error.message = "Invalid Password";
     throw error;
+  }
+
+  if (!user.vehicles) {
+    user = await getCollection(process.env.USER_COLLECTION).findOneAndUpdate(
+      { _id: user._id },
+      {
+        $set: {
+          vehicles: [user._id],
+        },
+      },
+      { new: true }
+    );
   }
 
   res.cookie("accessId", accessToken(user), {
@@ -75,6 +87,7 @@ const loginUser = asyncHandler(async (req, res) => {
       username: user.username,
       email: user.email,
       id: user._id,
+      vehicles: user.vehicles,
     },
   });
 });

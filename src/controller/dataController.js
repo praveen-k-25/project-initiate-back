@@ -1,3 +1,4 @@
+const { ObjectId } = require("mongodb");
 const {
   movingReportData,
   playbackReportData,
@@ -40,4 +41,29 @@ const playbackReport = async (req, res) => {
   });
 };
 
-module.exports = { movingReport, playbackReport };
+const dashboardVehicles = async (req, res) => {
+  const { user } = req.body;
+
+  const vehicleList = await getCollection(process.env.USER_COLLECTION).findOne({
+    _id: new ObjectId(user),
+  });
+
+  let result = [];
+  console.log(vehicleList);
+  vehicleList.forEach(async (vehicle) => {
+    const data = await getCollection(process.env.DATA_COLLECTION).findOne(
+      {
+        user: vehicle,
+      },
+      { sort: { timestamp: -1 } }
+    );
+    result.push(data);
+  });
+
+  res.status(200).json({
+    success: true,
+    data: result,
+  });
+};
+
+module.exports = { movingReport, playbackReport, dashboardVehicles };

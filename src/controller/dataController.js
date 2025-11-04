@@ -49,16 +49,15 @@ const dashboardVehicles = async (req, res) => {
   });
 
   let result = [];
-  console.log(vehicleList);
-  vehicleList.forEach(async (vehicle) => {
-    const data = await getCollection(process.env.DATA_COLLECTION).findOne(
+  for (let vehicle of vehicleList.vehicles) {
+    let data = await getCollection(process.env.DATA_COLLECTION).findOne(
       {
-        user: vehicle,
+        user: vehicle.toString(),
       },
       { sort: { timestamp: -1 } }
     );
-    result.push(data);
-  });
+    data && result.push(data);
+  }
 
   res.status(200).json({
     success: true,

@@ -22,11 +22,32 @@ const registerUser = async (req, res) => {
   }
 
   const hashedPassword = await hashPassword(password);
-  await registerModel(process.env.USER_COLLECTION, {
-    username,
-    email,
-    password: hashedPassword,
+  await registerModel(
+    process.env.USER_COLLECTION,
+    {
+      username,
+      email,
+      password: hashedPassword,
+    },
+    {}
+  );
+
+  let masterID = await getCollection(process.env.USER_COLLECTION).findOne({
+    email: process.env.MASTER_EMAIL,
   });
+
+  const user = await getCollection(process.env.USER_COLLECTION).findOne({
+    email,
+  });
+
+  if (
+    !masterID?.vehicles?.some((id) => id.toString() === user._id.toString())
+  ) {
+    await getCollection(process.env.USER_COLLECTION).updateOne(
+      { _id: masterID?._id },
+      { $push: { vehicles: user._id } }
+    );
+  }
 
   res.status(200).json({ success: true, message: "User registered" });
 };
@@ -87,7 +108,7 @@ const loginUser = asyncHandler(async (req, res) => {
       username: user.username,
       email: user.email,
       id: user._id,
-      vehicles: user.vehicles,
+      vehicles: user.vehicles || [],
     },
   });
 });

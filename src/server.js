@@ -45,7 +45,7 @@ process.on("unhandledRejection", (reason, p) => {
 });
 
 // server listening
-app.listen(process.env.PORT, () => {
+app.listen(10000, () => {
   console.log(`Server running on port ${process.env.PORT}`);
   keepServerAwake();
 });

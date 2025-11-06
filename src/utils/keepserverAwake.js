@@ -8,7 +8,7 @@ function keepServerAwake() {
     } catch (error) {
       console.error("🔴 Self-ping failed:", error.message);
     }
-  }, 1000); // every 9 minutes
+  }, 10 * 60 * 1000); // every 9 minutes
 }
 
 module.exports = keepServerAwake;

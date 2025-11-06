@@ -5,6 +5,7 @@ const { connectDB } = require("./database/db");
 const { globalErrorHandler } = require("./middleware/ErrorHandler");
 const userRouter = require("./routes/userRoutes");
 const dataRouter = require("./routes/dataRouter");
+const keepServerAwake = require("./utils/keepserverAwake");
 const app = express();
 
 // connect to database
@@ -30,6 +31,11 @@ app.use(express.json());
 app.use("/user", userRouter);
 app.use("/data", dataRouter);
 
+// self-ping
+app.get("/keep-alive", (req, res) =>
+  res.status(200).json({ success: true, status: 200 })
+);
+
 // captures all errors
 app.use(globalErrorHandler);
 
@@ -41,4 +47,5 @@ process.on("unhandledRejection", (reason, p) => {
 // server listening
 app.listen(process.env.PORT, () => {
   console.log(`Server running on port ${process.env.PORT}`);
+  keepServerAwake();
 });
